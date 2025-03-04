@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login Form</title>
+<style>
+body {
+    background-color: #0a1128; /* Dark blue background */
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #001f54; /* Blue container background */
+    border: 2px solid #0abde0; /* Cyan border */
+    border-radius: 10px;
+    padding: 40px 60px;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); /* Cyan glow */
+    text-align: center;
+    position: relative; /* For corner styles */
+}
+
+.login-container::before,
+.login-container::after {
+    content: '';
+    position: absolute;
+    border: 2px solid #0abde0;
+}
+
+/* Corner styles - top left */
+.login-container::before {
+    top: -10px;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    border-right: none;
+    border-bottom: none;
+}
+
+/* Corner styles - bottom right */
+.login-container::after {
+    bottom: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    border-top: none;
+    border-left: none;
+}
+
+
+.login-title {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    color: #0abde0; /* Cyan label color */
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.input-group input {
+    width: calc(100% - 22px); /* Adjust width to account for padding and border */
+    padding: 10px;
+    border: 1px solid #0abde0; /* Cyan input border */
+    border-radius: 5px;
+    background-color: #001f54; /* Match container background */
+    color: white; /* White input text */
+    font-size: 16px;
+    outline: none; /* Remove default focus outline */
+}
+
+.input-group input::placeholder {
+    color: #778ca3; /* Light cyan placeholder color */
+}
+
+
+button {
+    background-color: #0abde0; /* Cyan button color */
+    color: #001f54; /* Dark blue button text */
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #009ab4; /* Darker cyan on hover */
+}
+
+/* Icon styling - you'll need to add your own icon fonts or images */
+.icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+    /* Replace with your icon styling or background image */
+    background-color: #0abde0; /* Example cyan icon color */
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+}
+
+.user-icon {
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 6a4 4 0 110-8 4 4 0 010 8zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'); /* Example user icon SVG - replace with your icon path or font icon class */
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 6a4 4 0 110-8 4 4 0 010 8zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+}
+
+.lock-icon {
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm5-8H7V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>'); /* Example lock icon SVG - replace with your icon path or font icon class */
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm5-8H7V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>');
+}
+
+</style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">LOGIN</h2>
+        <div class="input-group">
+            <label for="username"><span class="icon user-icon"></span>Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username">
+        </div>
+        <div class="input-group">
+            <label for="password"><span class="icon lock-icon"></span>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password">
+        </div>
+        <button onclick="login()">LOGIN</button>
+    </div>
+
+<script>
+function login() {
+    alert('Login button clicked!'); // Replace with your actual login logic
+}
+</script>
+
+</body>
+</html>
