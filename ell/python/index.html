@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Single Page App</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        body {
+            background-color: #130a28; /* Dark blue background */
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* --- Themed Container Styles (applied to Login, Signup, Forgot Password, Reset Password) --- */
+        .container.login-section,
+        .container.signup-section,
+        .container.forgot-password-section,
+        .container.reset-password-section {
+            background-color: #001f54; /* Blue container background */
+            border: 2px solid #0abde0; /* Cyan border */
+            border-radius: 10px;
+            padding: 40px 60px;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); /* Cyan glow */
+            text-align: center;
+            position: relative; /* For corner styles */
+            width: 460px; /* Adjust width to match image */
+        }
+
+        .container.login-section::before,
+        .container.login-section::after,
+        .container.signup-section::before,
+        .container.signup-section::after,
+        .container.forgot-password-section::before,
+        .container.forgot-password-section::after,
+        .container.reset-password-section::before,
+        .container.reset-password-section::after {
+            content: '';
+            position: absolute;
+            border: 2px solid #0abde0;
+        }
+
+        /* Corner styles - top left */
+        .container.login-section::before,
+        .container.signup-section::before,
+        .container.forgot-password-section::before,
+        .container.reset-password-section::before {
+            top: -10px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        /* Corner styles - bottom right */
+        .container.login-section::after,
+        .container.signup-section::after,
+        .container.forgot-password-section::after,
+        .container.reset-password-section::after {
+            bottom: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            border-top: none;
+            border-left: none;
+        }
+
+
+        .login-title, /* Reusing login title style for other titles */
+        .signup-title,
+        .forgot-password-title,
+        .reset-password-title {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .container.login-section .input-group, /* Input groups in themed containers */
+        .container.signup-section .input-group,
+        .container.forgot-password-section .input-group,
+        .container.reset-password-section .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .container.login-section .input-group label, /* Labels in themed containers */
+        .container.signup-section .input-group label,
+        .container.forgot-password-section .input-group label,
+        .container.reset-password-section .input-group label {
+            display: block;
+            color: #0abde0; /* Cyan label color */
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .container.login-section .input-group input, /* Inputs in themed containers */
+        .container.signup-section .input-group input,
+        .container.forgot-password-section .input-group input,
+        .container.reset-password-section .input-group input {
+            width: calc(100% - 22px); /* Adjust width to account for padding and border */
+            padding: 10px;
+            border: 1px solid #0abde0; /* Cyan input border */
+            border-radius: 5px;
+            background-color: #001f54; /* Match container background */
+            color: white; /* White input text */
+            font-size: 16px;
+            outline: none; /* Remove default focus outline */
+        }
+
+        .container.login-section .input-group input::placeholder, /* Placeholders in themed containers */
+        .container.signup-section .input-group input::placeholder,
+        .container.forgot-password-section .input-group input::placeholder,
+        .container.reset-password-section .input-group input::placeholder {
+            color: #778ca3; /* Light cyan placeholder color */
+        }
+
+
+        .container.login-section button, /* Buttons in themed containers */
+        .container.signup-section button,
+        .container.forgot-password-section button,
+        .container.reset-password-section button {
+            background-color: #0abde0; /* Cyan button color */
+            color: #001f54; /* Dark blue button text */
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Keep margin for buttons in other sections too */
+        }
+
+        .container.login-section button:hover, /* Button hover in themed containers */
+        .container.signup-section button:hover,
+        .container.forgot-password-section button:hover,
+        .container.reset-password-section button:hover {
+            background-color: #009ab4; /* Darker cyan on hover */
+        }
+
+        /* Icon styling (no changes) */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            background-color: #0abde0; /* Example cyan icon color */
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+        }
+
+        .user-icon {
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 6a4 4 0 110-8 4 4 0 010 8zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+            mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 6a4 4 0 110-8 4 4 0 010 8zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+        }
+
+        .lock-icon {
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm5-8H7V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>');
+            mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm5-8H7V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>');
+        }
+
+        /* Dashboard Styles - Themed Container and Buttons */
+        .dashboard-container {
+            background-color: #000000; /* Blue container background */
+            border: 2px solid #0a60e0; /* Cyan border */
+            border-radius: 10px;
+            padding: 40px; /* Adjusted padding to match other containers roughly */
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); /* Cyan glow */
+            text-align: center;
+            position: relative; /* For corner styles */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dashboard-container::before,
+        .dashboard-container::after {
+            content: '';
+            position: absolute;
+            border: 2px solid #0abde0;
+        }
+
+        /* Corner styles - top left for dashboard */
+        .dashboard-container::before {
+            top: -10px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        /* Corner styles - bottom right for dashboard */
+        .dashboard-container::after {
+            bottom: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            border-top: none;
+            border-left: none;
+        }
+
+
+        .dashboard-container h1 {
+            color: white; /* White dashboard title */
+            margin-bottom: 30px;
+        }
+        .dashboard-buttons button, .dashboard-logout-button { /* Themed buttons for dashboard */
+            background-color: #0abde0; /* Cyan button color */
+            color: #001f54; /* Dark blue button text */
+            padding: 12px 30px; /* Adjusted padding to match login button */
+            border: none;
+            border-radius: 5px; /* Adjusted border-radius to match login button */
+            font-size: 18px; /* Adjusted font-size to match login button */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Keep margin */
+        }
+        .dashboard-buttons button:hover, .dashboard-logout-button:hover {
+            background-color: #009ab4; /* Darker cyan on hover */
+        }
+        .dashboard-logout-button {
+            margin-top: 20px; /* Keep margin */
+        }
+
+
+        /* Reset Password Section Styles (Original - no changes needed as already themed) */
+        .reset-password-section .container {
+            width: 450px; /* Wider container for reset password */
+        }
+
+
+        /* --- Original Styles (Keep other sections styled - adjusted container width) --- */
+        .signup-section, .forgot-password-section, .dashboard-section, .reset-password-section, .login-section {
+            display: none;
+        }
+
+
+        /* Original container styles (for other sections) - adjusted width */
+        .container {
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 460px; /* Wider container to match login */
+            text-align: center;
+            background-color: white; /* Default white background for other containers if needed */
+        }
+        .container h2 {
+            margin-bottom: 20px;
+            color: #333; /* Default title color if needed */
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555; /* Default label color if needed */
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd; /* Default input border if needed */
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #5cb85c; /* Default button color if needed - will be overridden in themed sections */
+            color: white;
+            padding: 12px 20px; /* Default button padding if needed - will be overridden in themed sections */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #4cae4c; /* Default button hover color if needed - will be overridden in themed sections */
+        }
+        .alt-links, .back-to-login {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .alt-links a, .back-to-login a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .alt-links a:hover, .back-to-login a:hover {
+            text-decoration: underline;
+        }
+        #login-error, #signup-error, #forgot-password-error, #reset-password-error {
+            color: red;
+            margin-top: 10px;
+        }
+        #forgot-password-success, #reset-password-success, #signup-success {
+            color: green;
+            margin-top: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container login-section" id="loginSection">
+        <h2 class="login-title">LOGIN</h2>
+        <div class="input-group">
+            <label for="username"><span class="icon user-icon"></span>Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username">
+        </div>
+        <div class="input-group">
+            <label for="password"><span class="icon lock-icon"></span>Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password">
+        </div>
+        <button onclick="login()">LOGIN</button>
+        <div class="alt-links">
+            <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+            <a href="#" onclick="showSignup()">Signup</a>
+        </div>
+        <div id="login-error" style="display:none;">Invalid credentials. Please try again.</div>
+    </div>
+
+    <div class="container signup-section" id="signupSection">
+        <h2 class="signup-title">SIGNUP</h2> <div class="input-group">
+            <label for="user_id">User ID</label>
+            <input type="text" id="user_id_signup" name="user_id" placeholder="Enter User ID" required>
+        </div>
+        <div class="input-group">
+            <label for="name">Name</label>
+            <input type="text" id="name_signup" name="name" placeholder="Enter your Name" required>
+        </div>
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email_signup" name="email" placeholder="Enter Email" required>
+        </div>
+        <div class="input-group">
+            <label for="password">Set Password</label>
+            <input type="password" id="password_signup" name="password" placeholder="Set Password" required>
+        </div>
+        <div class="input-group">
+            <label for="re_password">Re-enter Password</label>
+            <input type="password" id="re_password_signup" name="re_password" placeholder="Re-enter Password" required>
+        </div>
+        <button onclick="signup()">SIGNUP</button>
+        <div class="back-to-login">
+            <a href="#" onclick="showLogin()">Back to Login</a>
+        </div>
+         <div id="signup-error" style="display:none;"></div>
+         <div id="signup-success" style="display:none;">Signup successful! Please Login.</div>
+    </div>
+
+    <div class="container forgot-password-section" id="forgotPasswordSection">
+        <h2 class="forgot-password-title">FORGOT PASSWORD?</h2>
+        <div class="input-group">
+            <label for="username_email">Username or Email</label>
+            <input type="text" id="username_email_forgot" name="username_email" placeholder="Enter username or email">
+        </div>
+        <button onclick="requestResetPassword()">RESET PASSWORD</button>
+        <div class="back-to-login">
+            <a href="#" onclick="showLogin()">Back to Login</a>
+        </div>
+        <div id="forgot-password-error" style="display:none;"></div>
+        <div id="forgot-password-success" style="display:none;">Password reset link sent to your email (dummy). Please check your email to reset password.</div>
+    </div>
+
+    <div class="container reset-password-section" id="resetPasswordSection">
+        <h2 class="reset-password-title">RESET PASSWORD</h2>
+        <div class="input-group">
+            <label for="new_password_reset">New Password</label>
+            <input type="password" id="new_password_reset" name="new_password_reset" placeholder="Enter new password" required>
+        </div>
+        <div class="input-group">
+            <label for="re_new_password_reset">Re-enter New Password</label>
+            <input type="password" id="re_new_password_reset" name="re_new_password_reset" placeholder="Re-enter new password" required>
+        </div>
+        <button onclick="resetPassword()">RESET PASSWORD</button>
+        <div class="back-to-login">
+            <a href="#" onclick="showLogin()">Back to Login</a>
+        </div>
+        <div id="reset-password-error" style="display:none;"></div>
+        <div id="reset-password-success" style="display:none;">Password reset successful! Please Login with new password.</div>
+    </div>
+
+
+    <div class="dashboard-container dashboard-section" id="dashboardSection">
+        <h1>WELCOME TO DASHBOARD!</h1>
+        <p style="color: white; margin-bottom: 20px;">You have successfully logged in.</p>
+        <div class="dashboard-images">
+            <img src="python_image.png" alt="Python File 1">  <img src="python_image.png" alt="Python File 2">
+        </div>
+        <div class="dashboard-buttons">
+            <button onclick="openFile('my_script1.py')">Open Script 1</button> <button onclick="openFile('my_script2.py')">Open Script 2</button>
+        </div>
+        <button class="dashboard-logout-button" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <div class="reset-password-page" id="resetPageSection" style="display: none;">
+        <div class="container reset-password-section">
+            <h2>Reset Your Password</h2>
+            <div class="input-group">
+                <label for="new_password_reset_page">New Password:</label>
+                <input type="password" id="new_password_reset_page" name="new_password_reset_page" placeholder="Enter new password" required>
+            </div>
+            <div class="input-group">
+                <label for="re_new_password_reset_page">Re-enter New Password:</label>
+                <input type="password" id="re_new_password_reset_page" name="re_new_password_reset_page" placeholder="Re-enter new password" required>
+            </div>
+            <button onclick="resetPasswordFromPage()">Reset Password</button>
+            <div id="reset-password-page-message"></div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        // Function to show/hide sections
+        function showSection(sectionId) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('signupSection').style.display = 'none';
+            document.getElementById('forgotPasswordSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('resetPasswordSection').style.display = 'none';
+            document.getElementById('resetPageSection').style.display = 'none'; // Hide reset page section
+
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Reset error/success messages when switching sections
+            resetMessages();
+        }
+
+        function resetMessages() {
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('signup-error').style.display = 'none';
+            document.getElementById('signup-success').style.display = 'none';
+            document.getElementById('forgot-password-error').style.display = 'none';
+            document.getElementById('forgot-password-success').style.display = 'none';
+            document.getElementById('reset-password-error').style.display = 'none';
+            document.getElementById('reset-password-success').style.display = 'none';
+            document.getElementById('reset-password-page-message').style.display = 'none';
+        }
+
+
+        function showLogin() {
+            showSection('loginSection');
+        }
+
+        function showSignup() {
+            showSection('signupSection');
+        }
+
+        function showForgotPassword() {
+            showSection('forgotPasswordSection');
+        }
+
+        function showDashboard() {
+            showSection('dashboardSection');
+        }
+        function showResetPasswordSection() {
+            showSection('resetPasswordSection');
+        }
+        function showResetPageSection() {
+            showSection('resetPageSection'); // Show reset password page section
+        }
+
+
+        async function login() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            let login_successful = await eel.check_login(username, password)();
+            if (login_successful) {
+                showDashboard();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+
+        async function signup() {
+            let user_id = document.getElementById('user_id_signup').value;
+            let name = document.getElementById('name_signup').value;
+            let email = document.getElementById('email_signup').value;
+            let password = document.getElementById('password_signup').value;
+            let re_password = document.getElementById('re_password_signup').value;
+
+            let signup_result = await eel.register_user(user_id, name, email, password, re_password)();
+            if (signup_result === true) {
+                document.getElementById('signup-success').style.display = 'block';
+                document.getElementById('signup-error').style.display = 'none';
+
+            } else {
+                document.getElementById('signup-error').textContent = signup_result; // Display error message from python
+                document.getElementById('signup-error').style.display = 'block';
+                document.getElementById('signup-success').style.display = 'none';
+            }
+        }
+
+        async function requestResetPassword() {
+            let username_email = document.getElementById('username_email_forgot').value;
+            let reset_request_result = await eel.request_password_reset(username_email)();
+            if (reset_request_result === true) {
+                document.getElementById('forgot-password-success').style.display = 'block';
+                document.getElementById('forgot-password-error').style.display = 'none';
+                showResetPasswordSection(); // Show inline reset password section
+                //showResetPageSection(); // To test reset in separate page, use this instead and comment out showResetPasswordSection()
+                //document.getElementById('username_email_reset').value = username_email; // Optionally fill username/email in reset form
+            } else {
+                document.getElementById('forgot-password-error').textContent = reset_request_result; // Display error message from python
+                document.getElementById('forgot-password-error').style.display = 'block';
+                document.getElementById('forgot-password-success').style.display = 'none';
+            }
+        }
+
+        async function resetPassword() {
+            let new_password = document.getElementById('new_password_reset').value;
+            let re_new_password = document.getElementById('re_new_password_reset').value;
+            // For inline reset, username/email is already known from forgot password request
+            let username_email = document.getElementById('username_email_forgot').value;
+
+            let reset_result = await eel.reset_password("TEMP_RESET_TOKEN_" + username_email, new_password, re_new_password)(); // Insecure token for demonstration
+            if (reset_result === true) {
+                document.getElementById('reset-password-success').style.display = 'block';
+                document.getElementById('reset-password-error').style.display = 'none';
+                showLogin(); // Go back to login after reset
+            } else {
+                document.getElementById('reset-password-error').textContent = reset_result; // Display error message from python
+                document.getElementById('reset-password-error').style.display = 'block';
+                document.getElementById('reset-password-success').style.display = 'none';
+            }
+        }
+
+        async function resetPasswordFromPage() { // For reset password from separate page (via email link)
+            let newPassword = document.getElementById('new_password_reset_page').value;
+            let rePassword = document.getElementById('re_new_password_reset_page').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const resetToken = urlParams.get('token');
+
+            if (newPassword !== rePassword) {
+                document.getElementById('reset-password-page-message').innerText = "Passwords do not match.";
+                return;
+            }
+
+            if (!resetToken) {
+                document.getElementById('reset-password-page-message').innerText = "Invalid reset link.";
+                return;
+            }
+
+            let reset_successful = await eel.reset_password(resetToken, newPassword)();
+            if (reset_successful) {
+                document.getElementById('reset-password-page-message').innerText = "Password reset successful! Redirecting to login...";
+                setTimeout(() => {
+                    showLogin();
+                }, 2000); // Redirect after 2 seconds
+            } else {
+                document.getElementById('reset-password-page-message').innerText = "Password reset failed or invalid link.";
+            }
+        }
+
+
+        async function logout() {
+            showLogin();
+        }
+
+        async function openFile(filepath) {
+            let open_file_result = await eel.open_python_file(filepath)();
+            if (open_file_result !== true) {
+                alert(open_file_result); // Show error message if file opening fails
+            }
+        }
+
+        // Check if reset token is in URL on page load (for reset via email link)
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const resetToken = urlParams.get('token');
+            if (resetToken) {
+                showResetPageSection(); // Show reset password page if token in URL
+            } else {
+                 showLogin(); // Initially show only login section if no token
+            }
+        });
+
+
+    </script>
+</body>
+</html>
